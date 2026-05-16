@@ -1,13 +1,18 @@
-let coins = 0;
-let luck = 1;
-let coinMultiplier = 1;
+let coins = Number(localStorage.getItem("coins")) || 0;
+let luck = Number(localStorage.getItem("luck")) || 1;
+let coinMultiplier =
+    Number(localStorage.getItem("coinMultiplier")) || 1;
+
+let totalRolls =
+    Number(localStorage.getItem("totalRolls")) || 0;
 
 // Rewards
 const rewards = [
+
     {
         name: "Common Stone",
         rarity: "Common",
-        weight: 60,
+        chance: 40,
         base: 5,
         color: "#cccccc"
     },
@@ -15,7 +20,7 @@ const rewards = [
     {
         name: "Rust Metal",
         rarity: "Uncommon",
-        weight: 45,
+        chance: 25,
         base: 10,
         color: "#7CFC00"
     },
@@ -23,70 +28,84 @@ const rewards = [
     {
         name: "Magic Dust",
         rarity: "Rare",
-        weight: 30,
-        base: 20,
+        chance: 15,
+        base: 25,
         color: "#00BFFF"
     },
 
     {
         name: "Ancient Relic",
         rarity: "Epic",
-        weight: 15,
-        base: 50,
+        chance: 10,
+        base: 60,
         color: "#A020F0"
     },
 
     {
         name: "Dragon Core",
         rarity: "Legendary",
-        weight: 6,
-        base: 120,
+        chance: 6,
+        base: 150,
         color: "#FF8C00"
     },
 
     {
         name: "Celestial Orb",
         rarity: "Mythic",
-        weight: 2,
-        base: 300,
+        chance: 3,
+        base: 400,
         color: "#FF1493"
     },
 
     {
         name: "VOID ELEMENT",
         rarity: "Crystalic",
-        weight: 1,
-        base: 800,
+        chance: 0.9,
+        base: 1000,
         color: "#00FFFF"
+    },
+
+    {
+        name: "GALAXY GOD",
+        rarity: "Impossible",
+        chance: 0.1,
+        base: 5000,
+        color: "#ff0000"
     }
 ];
 
-// Roll system
+// Roll
 function roll() {
 
-    let pool = [];
+    const dice = document.getElementById("dice");
 
-    rewards.forEach(item => {
+    dice.classList.add("rolling");
 
-        let adjustedWeight = Math.max(
-            1,
-            Math.floor(item.weight / luck)
-        );
+    setTimeout(() => {
+        dice.classList.remove("rolling");
+    }, 400);
 
-        for (let i = 0; i < adjustedWeight; i++) {
-            pool.push(item);
+    let random = Math.random() * 100;
+
+    let current = 0;
+    let result = rewards[0];
+
+    for (let item of rewards) {
+
+        current += item.chance * luck;
+
+        if (random <= current) {
+            result = item;
+            break;
         }
-    });
-
-    let result =
-        pool[Math.floor(Math.random() * pool.length)];
+    }
 
     let earned =
         Math.floor(result.base * coinMultiplier);
 
     coins += earned;
 
-    updateUI();
+    totalRolls++;
 
     document.getElementById("result").innerHTML = `
         You got:
@@ -96,45 +115,65 @@ function roll() {
         <br>
         +${earned} coins
     `;
+
+    saveGame();
+    updateUI();
 }
 
-// Update UI
+// UI
 function updateUI() {
+
     document.getElementById("coins").innerText =
-        "Coins: " + coins;
+        `Coins: ${coins}`;
+
+    document.getElementById("stats").innerText =
+        `Luck: ${luck.toFixed(1)} | Coin Boost: x${coinMultiplier.toFixed(1)} | Rolls: ${totalRolls}`;
+}
+
+// Save
+function saveGame() {
+
+    localStorage.setItem("coins", coins);
+    localStorage.setItem("luck", luck);
+    localStorage.setItem("coinMultiplier", coinMultiplier);
+    localStorage.setItem("totalRolls", totalRolls);
 }
 
 // Buy luck
 function buyLuck() {
 
-    if (coins >= 100) {
+    let cost = 100;
 
-        coins -= 100;
+    if (coins >= cost) {
 
-        luck += 0.5;
+        coins -= cost;
 
+        luck += 0.1;
+
+        saveGame();
         updateUI();
-
-        alert("Luck increased!");
     }
 }
 
-// Buy coin multiplier
+// Buy multiplier
 function buyCoinBoost() {
 
-    if (coins >= 150) {
+    let cost = 150;
 
-        coins -= 150;
+    if (coins >= cost) {
 
-        coinMultiplier += 0.5;
+        coins -= cost;
 
+        coinMultiplier += 0.2;
+
+        saveGame();
         updateUI();
-
-        alert("Coin boost upgraded!");
     }
 }
 
-// Dice click
+// Click dice
 document
     .getElementById("dice")
     .addEventListener("click", roll);
+
+updateUI();

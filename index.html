@@ -1,55 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>RNG Dice Simulator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-    <link rel="stylesheet" href="style.css">
+<title>RNG Dice Simulator v0.0.2</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
 <body>
 
-    <h1>🎲 RNG Dice Simulator</h1>
+<h1>🎲 RNG Dice Simulator</h1>
 
-    <div id="coins">Coins: 0</div>
+<div id="coins">Coins: 0</div>
 
-    <div id="stats"></div>
+<div id="stats"></div>
 
-    <div id="dice">🎲</div>
+<div id="dice">🎲</div>
 
-    <div id="result">
-        Click the dice to roll!
-    </div>
+<div id="result">
 
-    <div class="shop">
+Click the dice to roll!
 
-        <div class="upgrade">
-            <h3>Luck Upgrade</h3>
+</div>
 
-            <p>
-                Increase chances of rare rewards
-            </p>
+<div class="main-container">
 
-            <button onclick="buyLuck()">
-                Buy (100 coins)
-            </button>
-        </div>
+<div class="shop">
 
-        <div class="upgrade">
-            <h3>Coin Boost</h3>
+<h2>Upgrades</h2>
 
-            <p>
-                Increase coin rewards
-            </p>
+<div class="upgrade">
 
-            <button onclick="buyCoinBoost()">
-                Buy (150 coins)
-            </button>
-        </div>
+<h3>Luck Upgrade</h3>
 
-    </div>
+<p>Increase rare chances</p>
 
-    <script src="script.js"></script>
+<button onclick="buyLuck()">
+
+Buy Luck
+
+</button>
+
+</div>
+
+<div class="upgrade">
+
+<h3>Coin Boost</h3>
+
+<p>Increase rewards</p>
+
+<button onclick="buyCoinBoost()">
+
+Buy Boost
+
+</button>
+
+</div>
+
+</div>
+
+<div class="inventory">
+
+<h2>Inventory</h2>
+
+<div id="inventoryList">
+
+Nothing Yet
+
+</div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
 
 </body>
 </html>

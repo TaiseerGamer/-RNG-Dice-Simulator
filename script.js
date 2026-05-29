@@ -1,179 +1,412 @@
-let coins = Number(localStorage.getItem("coins")) || 0;
-let luck = Number(localStorage.getItem("luck")) || 1;
-let coinMultiplier =
-    Number(localStorage.getItem("coinMultiplier")) || 1;
+let coins =
+Number(localStorage.getItem("coins")) || 0;
 
-let totalRolls =
-    Number(localStorage.getItem("totalRolls")) || 0;
+let luck =
+Number(localStorage.getItem("luck")) || 1;
 
-// Rewards
+let coinBoost =
+Number(localStorage.getItem("coinBoost")) || 1;
+
+let rolls =
+Number(localStorage.getItem("rolls")) || 0;
+
+let totalCoins =
+Number(localStorage.getItem("totalCoins")) || 0;
+
+let inventory =
+JSON.parse(
+localStorage.getItem("inventory")
+) || [];
+
+let highestRarity =
+localStorage.getItem("highestRarity")
+|| "None";
+
+const rarityValue = {
+
+"Common":1,
+
+"Uncommon":2,
+
+"Rare":3,
+
+"Epic":4,
+
+"Legendary":5,
+
+"Mythic":6,
+
+"Crystalic":7,
+
+"Impossible":8,
+
+"Divine":9,
+
+"Transcendent":10,
+
+"Secret":11
+
+};
+
 const rewards = [
 
-    {
-        name: "Common Stone",
-        rarity: "Common",
-        chance: 40,
-        base: 5,
-        color: "#cccccc"
-    },
+{
+name:"Stone",
+rarity:"Common",
+chance:35,
+reward:5,
+color:"#ccc"
+},
 
-    {
-        name: "Rust Metal",
-        rarity: "Uncommon",
-        chance: 25,
-        base: 10,
-        color: "#7CFC00"
-    },
+{
+name:"Metal",
+rarity:"Uncommon",
+chance:25,
+reward:10,
+color:"lime"
+},
 
-    {
-        name: "Magic Dust",
-        rarity: "Rare",
-        chance: 15,
-        base: 25,
-        color: "#00BFFF"
-    },
+{
+name:"Dust",
+rarity:"Rare",
+chance:15,
+reward:25,
+color:"cyan"
+},
 
-    {
-        name: "Ancient Relic",
-        rarity: "Epic",
-        chance: 10,
-        base: 60,
-        color: "#A020F0"
-    },
+{
+name:"Relic",
+rarity:"Epic",
+chance:10,
+reward:60,
+color:"violet"
+},
 
-    {
-        name: "Dragon Core",
-        rarity: "Legendary",
-        chance: 6,
-        base: 150,
-        color: "#FF8C00"
-    },
+{
+name:"Dragon Core",
+rarity:"Legendary",
+chance:6,
+reward:150,
+color:"orange"
+},
 
-    {
-        name: "Celestial Orb",
-        rarity: "Mythic",
-        chance: 3,
-        base: 400,
-        color: "#FF1493"
-    },
+{
+name:"Celestial Orb",
+rarity:"Mythic",
+chance:4,
+reward:300,
+color:"hotpink"
+},
 
-    {
-        name: "VOID ELEMENT",
-        rarity: "Crystalic",
-        chance: 0.9,
-        base: 1000,
-        color: "#00FFFF"
-    },
+{
+name:"Void Element",
+rarity:"Crystalic",
+chance:2,
+reward:700,
+color:"aqua"
+},
 
-    {
-        name: "GALAXY GOD",
-        rarity: "Impossible",
-        chance: 0.1,
-        base: 5000,
-        color: "#ff0000"
-    }
+{
+name:"Galaxy God",
+rarity:"Impossible",
+chance:1,
+reward:2000,
+color:"red"
+},
+
+{
+name:"Divine Flame",
+rarity:"Divine",
+chance:.5,
+reward:6000,
+color:"gold"
+},
+
+{
+name:"Universe Core",
+rarity:"Transcendent",
+chance:.2,
+reward:15000,
+color:"#ff44ff"
+},
+
+{
+name:"???",
+rarity:"Secret",
+chance:.05,
+reward:100000,
+color:"#ffffff"
+}
+
 ];
 
-// Roll
-function roll() {
+function roll(){
 
-    const dice = document.getElementById("dice");
+const dice =
+document.getElementById("dice");
 
-    dice.classList.add("rolling");
+dice.classList.add("rolling");
 
-    setTimeout(() => {
-        dice.classList.remove("rolling");
-    }, 400);
+setTimeout(()=>{
 
-    let random = Math.random() * 100;
+dice.classList.remove("rolling");
 
-    let current = 0;
-    let result = rewards[0];
+},400);
 
-    for (let item of rewards) {
+let totalWeight=0;
 
-        current += item.chance * luck;
+rewards.forEach(r=>{
 
-        if (random <= current) {
-            result = item;
-            break;
-        }
-    }
+totalWeight +=
+r.chance * luck;
 
-    let earned =
-        Math.floor(result.base * coinMultiplier);
+});
 
-    coins += earned;
+let random =
+Math.random()*totalWeight;
 
-    totalRolls++;
+let current=0;
 
-    document.getElementById("result").innerHTML = `
-        You got:
-        <span style="color:${result.color}">
-        ${result.name} (${result.rarity})
-        </span>
-        <br>
-        +${earned} coins
-    `;
+let result;
 
-    saveGame();
-    updateUI();
+for(let item of rewards){
+
+current +=
+item.chance * luck;
+
+if(random<=current){
+
+result=item;
+
+break;
+
 }
 
-// UI
-function updateUI() {
-
-    document.getElementById("coins").innerText =
-        `Coins: ${coins}`;
-
-    document.getElementById("stats").innerText =
-        `Luck: ${luck.toFixed(1)} | Coin Boost: x${coinMultiplier.toFixed(1)} | Rolls: ${totalRolls}`;
 }
 
-// Save
-function saveGame() {
+let earned =
+Math.floor(
+result.reward * coinBoost
+);
 
-    localStorage.setItem("coins", coins);
-    localStorage.setItem("luck", luck);
-    localStorage.setItem("coinMultiplier", coinMultiplier);
-    localStorage.setItem("totalRolls", totalRolls);
+coins += earned;
+
+totalCoins += earned;
+
+rolls++;
+
+inventory.unshift(
+
+`${result.name} (${result.rarity})`
+
+);
+
+if(
+
+rarityValue[result.rarity] >
+
+rarityValue[highestRarity]
+
+||
+
+highestRarity==="None"
+
+){
+
+highestRarity =
+result.rarity;
+
 }
 
-// Buy luck
-function buyLuck() {
+save();
 
-    let cost = 100;
+updateUI();
 
-    if (coins >= cost) {
+document.getElementById(
 
-        coins -= cost;
+"result"
 
-        luck += 0.1;
+).innerHTML=
 
-        saveGame();
-        updateUI();
-    }
+`
+<span style="color:${result.color}">
+
+${result.name}
+
+(${result.rarity})
+
+</span>
+
+<br>
+
++${earned} coins
+
+`;
+
 }
 
-// Buy multiplier
-function buyCoinBoost() {
+function updateUI(){
 
-    let cost = 150;
+document.getElementById(
 
-    if (coins >= cost) {
+"coins"
 
-        coins -= cost;
+).innerText=
 
-        coinMultiplier += 0.2;
+`Coins: ${coins}`;
 
-        saveGame();
-        updateUI();
-    }
+document.getElementById(
+
+"stats"
+
+).innerText=
+
+`Rolls: ${rolls} | Highest: ${highestRarity} | Total Coins: ${totalCoins}`;
+
+document.getElementById(
+
+"inventoryList"
+
+).innerHTML=
+
+inventory
+
+.slice(0,50)
+
+.map(
+
+x=>`<div>${x}</div>`
+
+)
+
+.join("");
+
 }
 
-// Click dice
+function buyLuck(){
+
+let cost =
+Math.floor(
+
+100*luck
+
+);
+
+if(coins>=cost){
+
+coins-=cost;
+
+luck += .1;
+
+save();
+
+updateUI();
+
+}
+
+}
+
+function buyCoinBoost(){
+
+let cost =
+Math.floor(
+
+150*coinBoost
+
+);
+
+if(coins>=cost){
+
+coins-=cost;
+
+coinBoost += .2;
+
+save();
+
+updateUI();
+
+}
+
+}
+
+function save(){
+
+localStorage.setItem(
+
+"coins",
+
+coins
+
+);
+
+localStorage.setItem(
+
+"luck",
+
+luck
+
+);
+
+localStorage.setItem(
+
+"coinBoost",
+
+coinBoost
+
+);
+
+localStorage.setItem(
+
+"rolls",
+
+rolls
+
+);
+
+localStorage.setItem(
+
+"totalCoins",
+
+totalCoins
+
+);
+
+localStorage.setItem(
+
+"inventory",
+
+JSON.stringify(
+
+inventory
+
+)
+
+);
+
+localStorage.setItem(
+
+"highestRarity",
+
+highestRarity
+
+);
+
+}
+
 document
-    .getElementById("dice")
-    .addEventListener("click", roll);
+
+.getElementById(
+
+"dice"
+
+)
+
+.addEventListener(
+
+"click",
+
+roll
+
+);
 
 updateUI();
